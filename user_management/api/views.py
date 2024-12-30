@@ -56,7 +56,6 @@ class UserLogoutView(APIView):
 
 
 class UserListView(APIView):
-    permission_classes = [IsAuthenticated]
 
     def get(self, request):
         users = User.objects.all()
