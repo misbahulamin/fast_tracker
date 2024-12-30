@@ -38,24 +38,27 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'django_filters',
     'corsheaders',
     'production',
     'maintenance',
     'user_management',
     'inventory',
+    'rest_framework.authtoken',
 ]
 CORS_ALLOW_ALL_ORIGINS = True
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
 
 ROOT_URLCONF = 'core.urls'
 
@@ -134,3 +137,10 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 CORS_ALLOWED_ORIGINS = [
      "http://localhost:5173",  # or your frontend URL
  ]
+
+# settings.py
+
+CSRF_TRUSTED_ORIGINS = [
+    'https://fast-tracker-bo3s.onrender.com',
+]
+
