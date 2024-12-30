@@ -5,11 +5,11 @@ from rest_framework.authtoken.models import Token
 from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
-from django.urls import reverse
 
 from ..models import Employee
 from .serializers import (UserRegistrationSerializer,UserLoginSerializer)
-
+from django.urls import reverse
+from django.shortcuts import redirect
 from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework import status
@@ -47,18 +47,10 @@ class UserLoginApiView(APIView):
             return Response({'error': "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-class UserLogoutView(APIView):
-    def get(self, request):
-        if hasattr(request.user, 'auth_token'):
-            request.user.auth_token.delete()
-        login_url = reverse('login')  # This will reverse the 'login' URL name
-        response = Response({'success': "Logout successful"}, status=status.HTTP_200_OK)
-        response['Location'] = login_url  # The Location header now points to the login URL
-        response.status_code = 302  # HTTP Status code for redirection
-        return response
 
 
 class UserListView(APIView):
+    permission_classes = [IsAuthenticated]
 
     def get(self, request):
         users = User.objects.all()
@@ -75,3 +67,13 @@ class EmployeeListAPIView(APIView):
         employees = Employee.objects.all()
         serializer = UserRegistrationSerializer(employees, many=True)
         return Response(serializer.data)
+    
+class UserLogoutView(APIView):
+    def get(self, request):
+        if hasattr(request.user, 'auth_token'):
+            request.user.auth_token.delete()
+        login_url = reverse('login')  # This will reverse the 'login' URL name
+        response = Response({'success': "Logout successful"}, status=status.HTTP_200_OK)
+        response['Location'] = login_url  # The Location header now points to the login URL
+        response.status_code = 302  # HTTP Status code for redirection
+        return response
