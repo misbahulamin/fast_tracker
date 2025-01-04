@@ -70,3 +70,20 @@ class UserLogoutView(APIView):
         request.user.auth_token.delete()
         logout(request)
         return Response({'success': "Logout successful"}, status=status.HTTP_200_OK)
+    
+class EmployeeNameAPIView(APIView):
+    # permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        try:
+            # Access the Employee instance associated with the logged-in user
+            employee = request.user.employee
+            # Retrieve the 'name' field
+            return Response({
+                'name': employee.name,
+                'designation': employee.designation,
+                'department': employee.department,
+                'company': employee.company
+            }, status=status.HTTP_200_OK)
+        except Employee.DoesNotExist:
+            return Response({'error': 'Employee profile not found'}, status=status.HTTP_404_NOT_FOUND)
