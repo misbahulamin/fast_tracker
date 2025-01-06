@@ -1,19 +1,25 @@
 from django.contrib import admin
-from .models import Mechanic, BreakdownLog, Machine
+from django import forms
+from .models import  BreakdownLog, Machine, Type, Brand, Category, Supplier
+from django.shortcuts import redirect
 
+class MachineAdminForm(forms.ModelForm):
+    class Meta:
+        model = Machine
+        fields = '__all__'
 
 class MachineAdmin(admin.ModelAdmin):
     # Fields to display in the list view
     list_display = ('machine_id', 'category', 'type', 'brand', 'model_number', 'serial_no', 'status', 'location', 'purchase_date', 'last_breakdown_start')
     
     # Fields that will be used for filtering the machines in the list view
-    list_filter = ('status', 'category', 'brand', 'location', 'floor_no', 'line_no')
+    list_filter = ('status', 'category', 'brand', 'location')
     
     # Fields to search in the list view
     search_fields = ('machine_id', 'category', 'type', 'brand', 'model_number', 'serial_no', 'location')
     
     # Fields that should be displayed in the detail view (edit form)
-    fields = ('machine_id', 'category', 'type', 'brand', 'model_number', 'serial_no', 'supplier', 'purchase_date', 'location', 'floor_no', 'line_no', 'status', 'last_breakdown_start')
+    fields = ('machine_id', 'category', 'type', 'brand', 'model_number', 'serial_no', 'supplier', 'purchase_date', 'location', 'status', 'last_breakdown_start')
     
     # Customize the ordering of machines in the list view
     ordering = ('-purchase_date',)  # Display the most recently purchased machines first
@@ -39,6 +45,12 @@ class MachineAdmin(admin.ModelAdmin):
     def mark_broken(self, request, queryset):
         queryset.update(status='broken')
     mark_broken.short_description = "Mark selected machines as Broken"
+
+    # def response_add(self, request, obj, post_url_continue=None):
+    #     # After adding a new machine, redirect to its change page
+    #     if "_save" in request.POST:
+    #         return redirect(f"/admin/maintenance/machine/{obj.machine_id}/change/")
+    #     return super().response_add(request, obj, post_url_continue)
 
 
 class BreakdownLogAdmin(admin.ModelAdmin):
@@ -66,9 +78,31 @@ class BreakdownLogAdmin(admin.ModelAdmin):
             'fields': ('lost_time', 'comments')
         })
     )
+class TypeAdmin(admin.ModelAdmin):
+    list_display = ('name', 'company')
+    # prepopulated_fields = {'slug': ('name',)}
+
+class BrandAdmin(admin.ModelAdmin):
+    list_display = ('name', 'company')
+    # prepopulated_fields = {'slug': ('name',)}
+
+class CategoryAdmin(admin.ModelAdmin):
+    list_display = ('name', 'company')
+    # prepopulated_fields = {'slug': ('name',)}    
+
+class SupplierAdmin(admin.ModelAdmin):
+    list_display = ('name', 'company')
+    # prepopulated_fields = {'slug': ('name',)}
+
+
 
 # Register the BreakdownLog model with its custom BreakdownLogAdmin
 admin.site.register(BreakdownLog, BreakdownLogAdmin)
+admin.site.register(Type, TypeAdmin)
+admin.site.register(Brand, BrandAdmin)
+admin.site.register(Category, CategoryAdmin)
+admin.site.register(Supplier, SupplierAdmin)
+
 
 # Register the admin class with the Machine model
 admin.site.register(Machine, MachineAdmin)

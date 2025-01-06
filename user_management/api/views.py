@@ -1,20 +1,25 @@
 from rest_framework import generics, status, viewsets
 from rest_framework.views import APIView
+from rest_framework.viewsets import ModelViewSet
 from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
 from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 
-from ..models import Employee
+from ..models import Employee, Department, Designation
 from .serializers import (UserRegistrationSerializer,UserLoginSerializer)
 from django.urls import reverse
 from django.shortcuts import redirect
 from rest_framework import generics
+from rest_framework.response import Response
+from rest_framework import status
+from .serializers import UserRegistrationSerializer, DepartmentSerializers, DesignationSerializers
 from permissions.base_permissions import IsAdmin, IsHR, IsMechanic, IsSupervisor, IsAdminOrSupervisorOrMechanic, IsAdminOrMechanic, IsAdminOrHR
 
+
 class UserRegistrationView(generics.CreateAPIView):
-    permission_classes = [IsAdminOrHR]
+    # permission_classes = [IsAdminOrHR]
     serializer_class = UserRegistrationSerializer
     def create(self, request):
         serializer = UserRegistrationSerializer(data=request.data)
@@ -47,7 +52,7 @@ class UserLoginApiView(APIView):
 
 
 class UserListView(APIView):
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
 
     def get(self, request):
         users = User.objects.all()
@@ -58,7 +63,7 @@ class UserListView(APIView):
 
 
 class EmployeeListAPIView(APIView):
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
 
     def get(self, request):
         employees = Employee.objects.all()
@@ -70,7 +75,7 @@ class UserLogoutView(APIView):
         request.user.auth_token.delete()
         logout(request)
         return Response({'success': "Logout successful"}, status=status.HTTP_200_OK)
-    
+
 class EmployeeNameAPIView(APIView):
     # permission_classes = [IsAuthenticated]
 
@@ -87,3 +92,12 @@ class EmployeeNameAPIView(APIView):
             }, status=status.HTTP_200_OK)
         except Employee.DoesNotExist:
             return Response({'error': 'Employee profile not found'}, status=status.HTTP_404_NOT_FOUND)
+
+
+class DepartmentViewSet(ModelViewSet):
+    queryset = Department.objects.all()
+    serializer_class = DepartmentSerializers
+
+class DesignationViewSet(ModelViewSet):
+    queryset = Designation.objects.all()
+    serializer_class = DesignationSerializers
